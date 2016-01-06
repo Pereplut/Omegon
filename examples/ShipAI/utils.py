@@ -3,14 +3,16 @@ import config
 from telebot import types
 
 
-def gen_markup(message):
+def gen_markup(order,arg):
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+    args=str(arg).capitalize()
+    list_items=[]
     #if not message:
     #    list_items=['system A','system B']
-    if message =='A' or 'a':
-        list_items=config.dict_a
-    elif  message =='B' or 'b':
-        list_items=config.dict_b
+    if args =='A':
+        list_items=config.list_a
+    elif  args =='B':
+        list_items=config.list_b
     else: list_items=['system A','system B']
     for el in list_items:
         markup.add(el)
@@ -20,10 +22,10 @@ def get_answer(chat_id,msg):
 
     try:
         command, arg = msg.split(" ", 1)
-        list_items=['system A','system B']
+        list_item=['system A','system B']
         tttDict={'system A':'system A is very big','system B':'system B has only one planet'}
-        if arg in list_items:
-          tmp_lst=list_items
+        if arg in list_item:
+          tmp_lst=list_item
           return tmp_lst, tttDict
         elif arg =='A' or 'a':
           tmp_lst=config.dict_a.keys()

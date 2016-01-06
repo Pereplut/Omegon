@@ -15,10 +15,10 @@ def show(message):
 
     try:
         command, arg = message.text.split(" ", 1)
-        markup=utils.gen_markup(arg)
+        markup=utils.gen_markup(command,arg)
         bot.send_message(message.chat.id, 'choose a view', reply_markup=markup)
         return True
-    except AttributeError:
+    except ValueError:
         markup=utils.gen_markup(0)
         bot.send_message(message.chat.id, 'choose a view', reply_markup=markup)
 
@@ -46,11 +46,11 @@ def check_answer(message):
                  bot.send_message(message.chat.id, rrr, reply_markup=keyboard_hider)
                 else:
                  bot.send_message(message.chat.id, 'неверный ввод', reply_markup=keyboard_hider)
-    except ValueError:
+    except TypeError:
         bot.send_message(message.chat.id, 'ERROR что-то случилось, нажмите')
 
 
 if __name__ == '__main__':
-    bot = telebot.TeleBot(config.token)
+    #bot = telebot.TeleBot(config.token)
     #bot.set_update_listener(listener)
     bot.polling(none_stop=True)
