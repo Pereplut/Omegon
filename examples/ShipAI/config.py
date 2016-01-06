@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-token='162596669:AAFNdt_HmUMk-mK-fD1wU4qm2RUWQgQo0zI'
+token='zI'
 
 
 dict_a={'system A':'system A descr','val1':'value one','val2':'value data'}
