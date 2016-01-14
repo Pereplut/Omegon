@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-token=''
-
+#token='162596669:AAFNdt_HmUMk-mK-fD1wU4qm2RUWQgQo0zI'
+LanceCrRate=3
+CannonCrRate=5
+CannonPower=3
 
 dict_a={'system A':'system A descr','val1':'value one','val2':'value data'}
 list_a=['system A','val1','val2']

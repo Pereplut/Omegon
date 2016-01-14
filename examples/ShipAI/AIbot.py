@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-import config
+#import config
+import BotToken
 import utils
 import telebot
 from telebot import types
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot(BotToken.token)
 
 #def listener(messages):
 #    for m in messages:
 #        if m.content_type == 'text':
 #            bot.send_message(m.chat.id, m.text)
 dakka_BS_value=0
-def setBS(val):
-    dakka_BS_value=val
-    return True
+
 
 
 @bot.message_handler(commands=['show'])
@@ -84,6 +83,6 @@ def check_answer(message):
 if __name__ == '__main__':
     #dakka_dice_value=0
     #dakka_bs_value=0
-    #bot = telebot.TeleBot(config.token)
+    #bot = telebot.TeleBot(BotToken.token)
     #bot.set_update_listener(listener)
     bot.polling(none_stop=True)

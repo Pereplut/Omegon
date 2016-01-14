@@ -45,6 +45,70 @@ def fire_markup():
 def gen_dmg():
     return None
 
+def LanceCalc(intValue):
+    tmp_val=mkRand(100)
+    #strOutValue=''
+    if tmp_val >intValue:
+        strOutValue= "toHit roll failed, {0} rolled and BS just {1}".format(tmp_val,intValue)
+    else:
+        succ_res=((intValue -tmp_val)/10) -1
+        if (succ_res -config.LanceCrRate)>=0:
+            crDmg=mkRand(10)
+            if crDmg>1:
+                Hull=str(crDmg-1)
+                new_output1=Hull+" hullpoints crashed, "
+                txt1=crResult()
+                new_output1+= txt1
+                strOutValue=new_output1
+            else:
+                Hull="1"
+                new_output2=Hull+" hullpoints crashed, "
+                txt2=str(crResult())
+                new_output2+= txt2
+                strOutValue=new_output2
+        else:
+            K= mkRand(10)-1
+            k="Hull gets "+str(K)+" points of damage"
+            strOutValue=k
+
+
+
+    return strOutValue
+
+def MacroCalc(intBSValue,intCannonNum=0):
+    tmp_val=mkRand(100)
+    CannonNumber=config.CannonPower*intCannonNum
+    #strOutValue=''
+    if tmp_val >intBSValue:
+        strOutValue= "Only MinMatars use to shoot with projectile, are you? toHit roll failed, {0} rolled and BS just {1}".format(tmp_val,intBSValue)
+        return strOutValue
+    else:
+        if CannonNumber>=config.CannonCrRate:
+            succ_res=((intBSValue -tmp_val)/10) -1
+            if (succ_res -config.CannonCrRate )>=0:
+                crDmg=mkRand(10)
+                damage=0
+                for elem in range(succ_res):
+                    damage+=mkRand(10)
+                if damage>(config.dict_ship['armour']+1):
+                    Hull=str(damage-1-config.dict_ship['armour'])
+                    new_output1=Hull+" hullpoints crashed, "
+                    txt1=crResult()
+                    new_output1+= txt1
+                    return new_output1
+                else:
+                    Hull="1"
+                    new_output2=Hull+" hullpoints crashed, "
+                    txt2=str(crResult())
+                    new_output2+= txt2
+                    return new_output2
+        else:
+            K= mkRand(10)-1
+            k="Hull gets "+str(K)+" points of damage"
+            strOutValue=k
+            return strOutValue
+        #return strOutValue
+
 
 def gen_markup(order,arg):
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
@@ -68,39 +132,14 @@ def dakka_result(chat_id,msg,bsVal):
         bs_val=int(bsVal)
         arg=str(msg)
         if arg =='Lance':
-            tmp_val=mkRand(100)
-            if tmp_val >bs_val:
-                return "toHit roll failed, {0}, {1}".format(tmp_val,bs_val)
-            else:
-                succ_res=(bs_val -tmp_val)/10
-                if (succ_res -4)>=0:
-                    crDmg=mkRand(10)
-                    if crDmg>1:
-                        Hull=str(crDmg-1)
-                        new_output1=Hull+" hullpoints crashed, "
-                        txt1=crResult()
-                        new_output1+= txt1
-                        return new_output1
-                    else:
-                        Hull="1"
-                        new_output2=Hull+" hullpoints crashed, "
-                        txt2=str(crResult())
-                        new_output2+= txt2
-                        return new_output2
-                else:
-                    K= mkRand(10)-1
-                    k="Hull gets "+str(K)+" points of damage"
-                    return k
+            output_text= LanceCalc(bs_val) # text
+            return output_text
         elif arg=='Macro 1':
-            tmp_val=mkRand(100)
-            if tmp_val >bs_val:
-                return "toHit roll failed"
-            else: return str(tmp_val)
+            output_text= MacroCalc(bs_val,1) # text
+            return output_text
         elif arg=='Macro 2':
-            tmp_val=mkRand(100)
-            if tmp_val >bs_val:
-                return "toHit roll failed"
-            else: return str(tmp_val)
+            output_text= MacroCalc(bs_val,2) # text
+            return output_text
         else:
             r='shit happens'
             return r
