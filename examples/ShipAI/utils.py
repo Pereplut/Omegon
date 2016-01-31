@@ -12,29 +12,34 @@ def mkRand(digit):
 def crResult():
     res=mkRand(5)
     if res ==1 :
-        fire=str(mkRand(10))
-        morale=str(mkRand(5))
-        component=config.module_list[mkRand(9)-1]
-        result= component +' is holed, '+fire+' ppl burned, '+morale+' morale is lost'
-        return result
+        fire=mkRand(10)
+        morale=mkRand(5)
+        component=config.module_list[mkRand(9)-1]+' is holed'
+        #result= component +' is holed, '+fire+' ppl burned, '+morale+' morale is lost'
+        return fire,morale,component
     if res==2:
-        component=config.module_list[mkRand(9)-1]
-        result=component+ ' is damaged '
-        return result
+        fire=0;morale=0
+        component=config.module_list[mkRand(9)-1] + ' is damaged '
+        #result=component+ ' is damaged '
+        return fire,morale,component
     if res==3:
-        return "sensors are destroyed, we are blind now"
+        fire=0;morale=0
+        component="sensors are destroyed, we are blind now"
+        return fire,morale,component
     if res==4:
         tmpVal=mkRand(10)
         if tmpVal>7:
-            return "Thrusters completely ruined"
+            component= "Thrusters are damaged beyond repair"
         else :
-            return "Thrusters are damaged by enemy fire"
+            component= "Thrusters are damaged by enemy fire"
+        fire=0;morale=0
+        return fire,morale,component
     if res==5:
-        fire=str(mkRand(5))
-        morale=str(mkRand(10))
-        component=config.module_list[mkRand(9)-1]
-        result= component +' burning now '+fire+' ppl burned alive, '+morale+' morale is lost'
-        return result
+        fire=mkRand(5)
+        morale=mkRand(10)
+        component=config.module_list[mkRand(9)-1] +' burning now '
+        #result= component +' burning now '+fire+' ppl burned alive, '+morale+' morale is lost'
+        return fire,morale,component
 def fire_markup():
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     dakka_type=['Lance','Macro 1','Macro 2']
@@ -44,69 +49,112 @@ def fire_markup():
 
 def gen_dmg():
     return None
+#hp=hull point, cp=crew points, mp= morale points,module -damaged ship module
+def gen_answer(hp,cp,mp,module):
+    HP,CP,MP,Mod='0','0','0','.'
+    if hp:
+        HP=str(hp) +' structure points are destroyed, '
+    if cp:
+        CP= str(220*cp)+ ' ppl are died, '
+    if mp:
+        MP='morale is reduced='+str(mp)+ ' '
+    if module:
+        Mod=module
+    txtOutput= HP+CP+MP+Mod
+    #if
+    return txtOutput
 
 def LanceCalc(intValue):
     tmp_val=mkRand(100)
     #strOutValue=''
     if tmp_val >intValue:
-        strOutValue= "toHit roll failed, {0} rolled and BS just {1}".format(tmp_val,intValue)
+        #strOutValue= "toHit roll failed, {0} rolled and BS just {1}".format(tmp_val,intValue)
+        HullDmg,MoralDmg,CrewDmg,Module=0,0,0,'.'
+        return  HullDmg,MoralDmg,CrewDmg,Module
     else:
         succ_res=((intValue -tmp_val)/10) -1
         if (succ_res -config.LanceCrRate)>=0:
-            crDmg=mkRand(10)
-            if crDmg>1:
-                Hull=str(crDmg-1)
-                new_output1=Hull+" hullpoints crashed, "
-                txt1=crResult()
-                new_output1+= txt1
-                strOutValue=new_output1
+            crDmg=mkRand(10)+4
+
+            HullDmg=crDmg
+            #new_output1=HullDmg+" hullpoints crashed, "
+            MoralDmg,CrewDmg,Module=crResult()
+            MoralDmg+=HullDmg
+            CrewDmg+=HullDmg
+            #new_output1+= txt1
+            #strOutValue=new_output1
+            return  HullDmg,MoralDmg,CrewDmg,Module
+            """
             else:
                 Hull="1"
                 new_output2=Hull+" hullpoints crashed, "
                 txt2=str(crResult())
                 new_output2+= txt2
                 strOutValue=new_output2
+            """
         else:
-            K= mkRand(10)-1
-            k="Hull gets "+str(K)+" points of damage"
-            strOutValue=k
+            HullDmg= mkRand(10)+4
+            MoralDmg=HullDmg
+            CrewDmg=HullDmg
+            Module='.'
+            #k="Hull gets "+str(K)+" points of damage"
+            #strOutValue=k
+            return  HullDmg,MoralDmg,CrewDmg,Module
 
 
 
-    return strOutValue
+    #return  HullDmg,MoralDmg,CrewDmg,Module # hp,cp,mp,module
 
 def MacroCalc(intBSValue,intCannonNum=0):
-    tmp_val=mkRand(100)
+    tmp_val=mkRand(10)
     CannonNumber=config.CannonPower*intCannonNum
     #strOutValue=''
     if tmp_val >intBSValue:
-        strOutValue= "Only MinMatars use to shoot with projectile, are you? toHit roll failed, {0} rolled and BS just {1}".format(tmp_val,intBSValue)
-        return strOutValue
+        hp,cp,mp=0,0,0
+        strOutValue= "Only minmatarians use to shoot with projectile, aren't you? toHit roll failed, {0} rolled and BS just {1}".format(tmp_val,intBSValue)
+        return hp,cp,mp,strOutValue
+    elif (intBSValue -tmp_val) < 20:
+        hp,cp,mp=0,0,0
+        strOutValue='shields absorbs all damage'
+        return hp,cp,mp,strOutValue
     else:
         if CannonNumber>=config.CannonCrRate:
             succ_res=((intBSValue -tmp_val)/10) -1
             if (succ_res -config.CannonCrRate )>=0:
-                crDmg=mkRand(10)
-                damage=0
-                for elem in range(succ_res):
-                    damage+=mkRand(10)
-                if damage>(config.dict_ship['armour']+1):
-                    Hull=str(damage-1-config.dict_ship['armour'])
-                    new_output1=Hull+" hullpoints crashed, "
-                    txt1=crResult()
-                    new_output1+= txt1
-                    return new_output1
+                #crDmg=mkRand(10)
+                HullDmg=0
+                for elem in range(succ_res-1):
+                    HullDmg+=mkRand(10)
+                if HullDmg>int(config.dict_ship['Armour']):
+                    HullDmg-=int(config.dict_ship['Armour'])
+                    #new_output1=HullDmg+" hullpoints crashed, "
+                    MoralDmg,CrewDmg,Module=crResult()
+                    MoralDmg+=HullDmg
+                    CrewDmg+=HullDmg
+                    #new_output1+= txt1
+                    return  HullDmg,MoralDmg,CrewDmg,Module
                 else:
-                    Hull="1"
-                    new_output2=Hull+" hullpoints crashed, "
-                    txt2=str(crResult())
-                    new_output2+= txt2
-                    return new_output2
+                    HullDmg=1
+                    #new_output2=Hull+" hullpoints crashed, "
+                    MoralDmg,CrewDmg,Module=crResult()
+                    MoralDmg+=HullDmg
+                    CrewDmg+=HullDmg
+                    #new_output2+= txt2
+                    return  HullDmg,MoralDmg,CrewDmg,Module
         else:
-            K= mkRand(10)-1
-            k="Hull gets "+str(K)+" points of damage"
-            strOutValue=k
-            return strOutValue
+            succ_res=((intBSValue -tmp_val)/10) -1
+            HullDmg=0
+            for elem in range(succ_res-1):
+                    HullDmg+=mkRand(10)
+            if HullDmg > int(config.dict_ship['Armour']):
+                HullDmg-=int(config.dict_ship['Armour'])
+                strOutValue='.'
+            else:
+                HullDmg=0
+                strOutValue="toHit roll failed, {0} rolled and BS just {1}".format(tmp_val,intBSValue)
+            MoralDmg=HullDmg
+            CrewDmg=HullDmg
+            return HullDmg,MoralDmg,CrewDmg,strOutValue
         #return strOutValue
 
 
@@ -125,20 +173,23 @@ def gen_markup(order,arg):
         markup.add(el)
     return markup
 
-def dakka_result(chat_id,msg,bsVal):
+def dakka_result(chat_id,msg,bsVal,shipClass):
     #this one returns string format
     try:
-        #list_item=['Lance','Macro 1','Macro 2']
+
         bs_val=int(bsVal)
         arg=str(msg)
         if arg =='Lance':
-            output_text= LanceCalc(bs_val) # text
+            Hp,Cp,Mp,Module= LanceCalc(bs_val) # text
+            output_text=gen_answer(Hp,Cp,Mp,Module)
             return output_text
         elif arg=='Macro 1':
-            output_text= MacroCalc(bs_val,1) # text
+            Hp,Cp,Mp,Module= MacroCalc(bs_val,1) # text
+            output_text=gen_answer(Hp,Cp,Mp,Module)
             return output_text
         elif arg=='Macro 2':
-            output_text= MacroCalc(bs_val,2) # text
+            Hp,Cp,Mp,Module= MacroCalc(bs_val,2) # text
+            output_text=gen_answer(Hp,Cp,Mp,Module)
             return output_text
         else:
             r='shit happens'

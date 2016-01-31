@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#import config
+import config
 import BotToken
 import utils
 import telebot
@@ -10,8 +10,8 @@ bot = telebot.TeleBot(BotToken.token)
 #    for m in messages:
 #        if m.content_type == 'text':
 #            bot.send_message(m.chat.id, m.text)
-dakka_BS_value=0
-
+#dakka_BS_value=0
+shipStats= config.shipFireDrake('testship')
 
 
 @bot.message_handler(commands=['show'])
@@ -44,7 +44,7 @@ def fire(message):
         global dakka_BS_value
         dakka_BS_value=BS
         markup=utils.fire_markup()
-        bot.send_message(message.chat.id, 'Dakka time!', reply_markup=markup)
+        bot.send_message(message.chat.id,'choose a weapon',  reply_markup=markup)
 
         return True
     except ValueError:
@@ -55,14 +55,14 @@ def fire(message):
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def check_answer(message):
     try:
-            answer=utils.dakka_result(message.chat.id,message.text,dakka_BS_value)   # this is LIST
+            answer=utils.dakka_result(message.chat.id,message.text,dakka_BS_value,shipStats)   # this is LIST
             if not answer:
-                bot.send_message(message.chat.id, 'Чтобы что-то случилось, нажмите  /show')
+                bot.send_message(message.chat.id, 'Чтобы что-то случилось, нажмите  /fire')
             else :
                 keyboard_hider = types.ReplyKeyboardHide()
                 bot.send_message(message.chat.id, answer, reply_markup=keyboard_hider)
     except TypeError:
-        bot.send_message(message.chat.id, 'ERROR что-то случилось, нажмите')
+        bot.send_message(message.chat.id, 'ERROR что-то случилось')
 
 
 """
